@@ -1,4 +1,3 @@
-from functools import lru_cache
 from numpy import ceil
 from numpy.random import choice, randint
 from enum import Enum
@@ -41,16 +40,18 @@ class Personaje:
         
         
     def get_stats(self):
-        print(f'''{self.__nombre}:
-Vida: {self.__vida}
-Fuerza: {self.__fuerza}
-Defensa: {self.__defensa}
-Magia: {self.__magia}
-Resistencia: {self.__resistencia}
-Velocidad: {self.__velocidad}
-Habilidad: {self.__habilidad}
-Suerte: {self.__suerte}
-''')
+        return {
+    'nombre': self.__nombre,
+    'vida': self.__vida,
+    'fuerza': self.__fuerza,
+    'defensa': self.__defensa,
+    'magia': self.__magia,
+    'resistencia': self.__resistencia,
+    'velocidad': self.__velocidad,
+    'habilidad': self.__habilidad,
+    'suerte': self.__suerte
+        }
+
         
     #Estas 4 funciones son para mejorar el metodo atacar y adaptarlo a la subclase Clérigo
     def get_nombre(self) -> str:
@@ -280,8 +281,10 @@ class Espadachin (Personaje):
         maestria = Maestria.FISICO
     
         super().__init__(nombre, vida, fuerza, defensa, magia, resistencia, velocidad, habilidad, suerte, maestria)
-        
-def turno():
+ 
+ 
+#Esto es el simulador de un turno       
+""" def turno():
     hero.atacar(enemy)
     if enemy.get_vida() <= 0:
         enemy.set_vida(0)  # Asegura que la vida no sea negativa
@@ -297,20 +300,4 @@ def turno():
         print(f"{hero.get_nombre()} ha muerto")    
         return False
     print(f"{hero.get_nombre()} tiene {hero.get_vida()} puntos de vida")
-    
-hero = Clerigo("Hero")
-enemy = Clerigo("Enemy")
-
-for n in range(100):
-    print(f"Turno {n+1}")
-    turno()
-    print("\n")
-    if enemy.get_vida() == 0:
-        print(f"{hero.get_nombre()} gana!!")
-        break
-    elif hero.get_vida() == 0:
-        print(f"{enemy.get_nombre()} gana!!")
-        break
-    else:
-        print("Estamos llegando correctamente al else \n")
-
+     """
