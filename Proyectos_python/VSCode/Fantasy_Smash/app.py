@@ -1,3 +1,4 @@
+import os
 from flask import Flask, request, jsonify, render_template, session, redirect, url_for, flash
 from game import Constantes_combate, Clerigo, Espadachin, Soldado, Guerrero, Mago
 from db import Database
@@ -334,4 +335,5 @@ def ranking():
         'ranking.html', rankings=rankings,is_logged_in='user_id' in session)
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    port = int(os.environ.get('PORT', 5000))
+    app.run(host='0.0.0.0', port=port)
