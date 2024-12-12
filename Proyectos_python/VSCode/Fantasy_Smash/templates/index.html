@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fantasy Smash</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
+    <link href="https://fonts.googleapis.com/css?family=Press Start 2P" rel="stylesheet"> 
+    <link href="https://fonts.cdnfonts.com/css/gumball" rel="stylesheet">
+</head>
+<body>
+    <div class="container">
+        <h1 class="title" onclick="window.location.href='/'"> Fantasy Smash </h1>
+    <div class="top_bar_btns">
+    {% if is_logged_in %}
+        <button onclick="window.location.href='/ranking'">Ranking</button>
+        <div class="dropdown">
+            <button class="dropbtn">Editar Usuario</button>
+            <div class="dropdown-content">
+                <a href="#" onclick="ui.showChangeUsernameModal()">Cambiar Username</a>
+                <a href="#" onclick="ui.showDeleteUserModal()">Borrar Usuario</a>
+            </div>
+        </div>
+        <button onclick="window.location.href='/logout'">Cerrar Sesión</button>
+    {% else %}
+        <button onclick="window.location.href='/ranking'">Ranking</button>
+        <button onclick="ui.showLoginModal()">Inicia Sesión</button>
+        <button onclick="ui.showRegisterModal()">Regístrate</button>
+    {% endif %}
+    </div>
+        <div id="setup-screen" class="game-setup">
+            <h2>Elige a tu Campeón</h2>
+            <div class="character-carousel">
+                <button class="carousel-button prev">←</button>
+                <button class="carousel-button next">→</button>
+                
+                <div class="card-container">
+                    <!-- Las tarjetas se generarán dinámicamente -->
+                </div>
+                
+                <div class="carousel-indicators">
+                    <!-- Los indicadores se generarán dinámicamente -->
+                </div>
+            </div>
+            
+            <button class="start-button">¡Comenzar!</button>
+            </div>
+        </div>
+
+        <div id="game-screen" class="game-area" style="display: none;">
+            <div class="battle-info">
+                <h3>Batalla <span id="battle-number">1</span>/5</h3>
+                <p>Oponente actual: <span id="enemy-class"></span></p>
+            </div>
+            
+            <div class="game-layout">
+                <div class="hero-stats-panel" id="hero-stats">
+                    <!-- Stats del héroe se mostrarán aquí -->
+                </div>
+
+                <div class="combat-area">
+                    <div class="characters">
+                        <div class="character hero">
+                            <h3 id="hero-name"></h3>
+                            <div class="health-bar">
+                                <div id="hero-health" class="health-fill"></div>
+                            </div>
+                            <p class="vida-heroe">HP: <span id="hero-hp">0</span></p>
+                            <img class="character-sprite" alt="Hero sprite">
+                        </div>
+
+                        <div class="character enemy">
+                            <h3 id="enemy-name">Enemigo</h3>
+                            <div class="health-bar">
+                                <div id="enemy-health" class="health-fill"></div>
+                            </div>
+                            <p class="vida-enemiga">HP: <span id="enemy-hp">20</span></p>
+                            <img class="character-sprite" alt="Enemy sprite">
+                        </div>
+                    </div>
+
+                    <div class="controls">
+                        <button class="attack-btn" id="attack-btn">Atacar</button>
+                    </div>
+
+                    <div id="combat-log" class="combat-log">
+                        <!-- Mensajes de combate aparecerán aquí -->
+                    </div>
+                    <div id="victory-screen" class="modal-overlay" style="display: none;">
+                        <div class="modal-content">
+                            <h2>¡Victoria!</h2>
+                            <p>Has derrotado a tu oponente</p>
+                            <button onclick="handleNextBattle()" class="next-battle-button">
+                                Siguiente Batalla
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div id="game-over-screen" class="modal-overlay" style="display: none;">
+                        <div class="modal-content">
+                            <h2>Game Over</h2>
+                            <p>Has sido derrotado</p>
+                            <div class="game-over-controls">
+                                <button onclick="window.location.reload()" class="restart-button">
+                                    Volver a Jugar
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div id="game-complete-screen" class="modal-overlay" style="display: none;">
+                        <div class="modal-content">
+                            <h2>¡Felicitaciones!</h2>
+                            <p>Has completado todas las batallas</p>
+                            <div class="game-over-controls">
+                                <button onclick="window.location.reload()" class="restart-button">
+                                    Jugar de Nuevo
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+            <!-- Modal de Login -->
+    <div id="login-modal" class="modal-overlay" style="display: none;">
+        <div class="modal-content auth-modal">
+            <div class="modal-header">
+                <button class="close" onclick="ui.closeModal('login-modal')">&times;</button>
+                <h2>Iniciar Sesión</h2>
+            </div>
+            
+            <form id="login-form" method="POST" action="{{ url_for('login') }}" class="auth-form">
+                <div class="form-group">
+                    <label for="username"></label>
+                    <input type="text" placeholder="Usuario:" id="username" name="username" autocomplete="off" required>
+                </div>
+                <div class="form-group">
+                    <label for="password"></label>
+                    <input type="password"  id="password" name="password" placeholder="Contraseña:" autocomplete="off" required>
+                </div>
+                <br>
+                <br>
+                <div class="form-actions">
+                    <button type="submit" class="submit-button">Iniciar Sesión</button>
+                    <br>
+                    <p>¿No tienes cuenta? <a href="#" onclick="ui.showRegisterModal()">Regístrate</a></p>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal de Registro -->
+    <div id="register-modal" class="modal-overlay" style="display: none;">
+        <div class="modal-content auth-modal">
+            <div class="modal-header">
+                <h2>Registro</h2>
+                <button class="close" onclick="ui.closeModal('register-modal')">&times;</button>
+            </div>
+            
+            <form id="register-form" method="POST" action="{{ url_for('register') }}" class="auth-form">
+                <div class="form-group">
+                    <label for="reg-username"></label>
+                    <input type="text" placeholder="Usuario:" id="reg-username" name="username" autocomplete="off" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="reg-password"></label>
+                    <input type="password" placeholder="Contraseña:" id="reg-password" name="password"  autocomplete="off" required>
+                </div>
+                <br>
+                <br>
+                <div class="form-actions">
+                    <button type="submit" class="submit-button">Registrarse</button>
+                    <br>
+                    <p>¿Ya tienes cuenta? <a href="#" onclick="ui.showLoginModal()">Inicia sesión</a></p>
+                </div>
+            </form>
+        </div>
+    </div>
+    <!-- Modal para cambiar username -->
+<div id="change-username-modal" class="modal-overlay" style="display: none;">
+    <div class="modal-content auth-modal">
+        <div class="modal-header">
+            <h2>Cambiar Username</h2>
+            <button class="close" onclick="ui.closeModal('change-username-modal')">&times;</button>
+        </div>
+        <form id="change-username-form" method="POST" action="{{ url_for('update_username') }}" class="auth-form">
+            <div class="form-group">
+                <label for="current-username"></label>
+                <input type="text" id="current-username" placeholder="Usuario actual:" autocomplete="off" name="username" required>
+            </div>
+            <div class="form-group">
+                <label for="new-username"></label>
+                <input type="text" id="new-username" placeholder="Nuevo Usuario:" autocomplete="off" name="new_username" required>
+            </div>
+            <div class="form-group">
+                <label for="confirm-password"></label>
+                <input type="password" id="confirm-password" placeholder="Contraseña:" autocomplete="off" name="password" required>
+            </div>
+            <br>
+            <br>
+            <div class="form-actions">
+                <button type="submit" class="submit-button">Cambiar Username</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Modal para borrar usuario -->
+<div id="delete-user-modal" class="modal-overlay" style="display: none;">
+    <div class="modal-content auth-modal">
+        <div class="modal-header">
+            <h2>Borrar Usuario</h2>
+            <button class="close" onclick="ui.closeModal('delete-user-modal')">&times;</button>
+        </div>
+        <form id="delete-user-form" method="POST" action="{{ url_for('delete_user') }}" class="auth-form">
+            <div class="form-group">
+                <label for="delete-username"></label>
+                <input type="text" id="delete-username" placeholder="Usuario:" autocomplete="off" name="username" required>
+            </div>
+            <div class="form-group">
+                <label for="delete-password"></label>
+                <input type="password" id="delete-password" placeholder="Contraseña:" autocomplete="off" name="password" required>
+            </div>
+            <br>
+            <br>
+            <div class="form-actions">
+                <button type="submit" class="submit-button">Borrar Usuario</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+    {% with messages = get_flashed_messages() %}
+        {% if messages %}
+        <script>
+            console.log("Flash messages:", JSON.parse('{{ messages|tojson|safe }}'));
+        </script>
+        <div id="flash-modal" class="modal-overlay">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button class="close" onclick="ui.closeModal('flash-modal')">&times;</button>
+                </div>
+                {% for message in messages %}
+                    <p class="flash-message">{{ message }}</p>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+    {% endwith %}
+    </div>
+
+    <script src="{{ url_for('static', filename='js/api.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/ui.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/characters.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/game.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+</body>
+</html>
