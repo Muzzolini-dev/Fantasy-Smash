@@ -65,56 +65,61 @@ const ui = (function() {
       document.getElementById('enemy-class').textContent = enemyClass;
     }
   
-    function updateCharacterStats(hero, enemy, hero_type) {
-      try {
-          console.log('Actualizando stats con:', { hero, enemy });
-          
-          // Verificar datos
-          if (!hero || !enemy) {
-              console.error('Datos de personajes incompletos:', { hero, enemy });
-              return;
-          }
-  
-          // Actualizar nombre y HP del héroe
-          const heroName = document.getElementById('hero-name');
-          const heroHp = document.getElementById('hero-hp');
-          const heroHealth = document.getElementById('hero-health');
-          
-          if (heroName) heroName.textContent = hero.nombre;
-          if (heroHp) heroHp.textContent = hero.vida;
-          if (heroHealth) heroHealth.style.width = `${(hero.vida / 21) * 100}%`;
-          
-          // Actualizar nombre y HP del enemigo
-          const enemyName = document.getElementById('enemy-name');
-          const enemyHp = document.getElementById('enemy-hp');
-          const enemyHealth = document.getElementById('enemy-health');
-          
-          if (enemyName) enemyName.textContent = enemy.nombre;
-          if (enemyHp) enemyHp.textContent = enemy.vida;
-          if (enemyHealth) enemyHealth.style.width = `${(enemy.vida / 21) * 100}%`;
-          
-          // Actualizar panel de stats del héroe
-          const heroStats = document.getElementById('hero-stats');
-          if (heroStats) {
-              heroStats.innerHTML = `
-                  <h3>Stats del ${hero_type || hero.nombre}</h3>
-                  <div class="stat-grid">
-                      <div>Vida:</div><div>${hero.vida}</div>
-                      <div>Fuerza:</div><div>${hero.fuerza}</div>
-                      <div>Defensa:</div><div>${hero.defensa}</div>
-                      <div>Magia:</div><div>${hero.magia}</div>
-                      <div>Resistencia:</div><div>${hero.resistencia}</div>
-                      <div>Velocidad:</div><div>${hero.velocidad}</div>
-                      <div>Habilidad:</div><div>${hero.habilidad}</div>
-                      <div>Suerte:</div><div>${hero.suerte}</div>
-                  </div>
-              `;
-          }
-      } catch (error) {
-          console.error('Error al actualizar stats:', error);
-          ui.showMessage('Error al actualizar estadísticas');
-      }
-  }
+    function updateCharacterStats(hero, enemy, hero_type, updateTarget = 'both') {
+        try {
+            console.log('Actualizando stats con:', { hero, enemy });
+            
+            if (!hero || !enemy) {
+                console.error('Datos de personajes incompletos:', { hero, enemy });
+                return;
+            }
+    
+            // Actualizar stats del héroe solo si se especifica 'hero' o 'both'
+            if (updateTarget === 'hero' || updateTarget === 'both') {
+                const heroName = document.getElementById('hero-name');
+                const heroHp = document.getElementById('hero-hp');
+                const heroHealth = document.getElementById('hero-health');
+                
+                if (heroName) heroName.textContent = hero.nombre;
+                if (heroHp) heroHp.textContent = hero.vida;
+                if (heroHealth) heroHealth.style.width = `${(hero.vida / 21) * 100}%`;
+    
+                // Actualizar el panel de stats siempre que se actualice la vida del héroe
+                const heroStats = document.getElementById('hero-stats');
+                if (heroStats) {
+                    const statsHtml = `
+                        <h3>Stats del ${hero_type || hero.nombre}</h3>
+                        <div class="stat-grid">
+                            <div>Vida:</div><div>${hero.vida}</div>
+                            <div>Fuerza:</div><div>${hero.fuerza}</div>
+                            <div>Defensa:</div><div>${hero.defensa}</div>
+                            <div>Magia:</div><div>${hero.magia}</div>
+                            <div>Resistencia:</div><div>${hero.resistencia}</div>
+                            <div>Velocidad:</div><div>${hero.velocidad}</div>
+                            <div>Habilidad:</div><div>${hero.habilidad}</div>
+                            <div>Suerte:</div><div>${hero.suerte}</div>
+                        </div>
+                    `;
+                    heroStats.innerHTML = statsHtml;
+                }
+            }
+            
+            // Actualizar stats del enemigo solo si se especifica 'enemy' o 'both'
+            if (updateTarget === 'enemy' || updateTarget === 'both') {
+                const enemyName = document.getElementById('enemy-name');
+                const enemyHp = document.getElementById('enemy-hp');
+                const enemyHealth = document.getElementById('enemy-health');
+                
+                if (enemyName) enemyName.textContent = enemy.nombre;
+                if (enemyHp) enemyHp.textContent = enemy.vida;
+                if (enemyHealth) enemyHealth.style.width = `${(enemy.vida / 21) * 100}%`;
+            }
+    
+        } catch (error) {
+            console.error('Error al actualizar stats:', error);
+            ui.showMessage('Error al actualizar estadísticas');
+        }
+    }
   
     function showMessage(message) {
       const log = document.getElementById('combat-log');

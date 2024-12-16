@@ -134,22 +134,18 @@ const characters = (function() {
     }
 
     function setupNavigation() {
-      // Configurar botones de navegación
-      const prevButton = document.createElement('button');
-      prevButton.className = 'carousel-button prev';
-      prevButton.textContent = '←';
-      prevButton.onclick = () => showCard(currentCard - 1);
-
-      const nextButton = document.createElement('button');
-      nextButton.className = 'carousel-button next';
-      nextButton.textContent = '→';
-      nextButton.onclick = () => showCard(currentCard + 1);
-
-      // Agregar botones al DOM
-      const carousel = document.querySelector('.character-carousel');
-      carousel.insertBefore(prevButton, carousel.firstChild);
-      carousel.appendChild(nextButton);
-    }
+      // Encontrar los botones existentes
+      const prevButton = document.querySelector('.carousel-button.prev');
+      const nextButton = document.querySelector('.carousel-button.next');
+      
+      // Agregar los event listeners
+      if (prevButton) {
+          prevButton.onclick = () => showCard(currentCard - 1);
+      }
+      if (nextButton) {
+          nextButton.onclick = () => showCard(currentCard + 1);
+      }
+}
   
     function showCard(index) {
       const cards = document.querySelectorAll('.character-card');

@@ -70,6 +70,7 @@ const game = (function() {
       try {
           const attackButton = document.querySelector('.attack-btn');
           attackButton.disabled = true;
+          
           // Primero el ataque del héroe
           await ui.animateAttack(true, state.heroType, state.enemy.clase);
           console.log('Ataque del héroe completado');
@@ -77,7 +78,8 @@ const game = (function() {
           // Procesamos resultados del héroe
           state.hero = data.hero_stats || data.hero;
           state.enemy.vida = data.enemy_hp;
-          ui.updateCharacterStats(state.hero, state.enemy);
+          // Actualizamos solo la barra del enemigo después del ataque del héroe
+          ui.updateCharacterStats(state.hero, state.enemy, null, 'enemy');
           
           let mensajeAtaque = `Daño causado: ${data.damage_dealt}`;
           if (data.healing !== undefined && data.healing > 0) {
@@ -92,6 +94,8 @@ const game = (function() {
               await new Promise(resolve => setTimeout(resolve, 500));
               // Realizamos el contraataque
               await ui.animateAttack(false, state.heroType, state.enemy.clase);
+              // Actualizamos solo la barra del héroe después del contraataque
+              ui.updateCharacterStats(state.hero, state.enemy, null, 'hero');
               ui.showMessage(`Daño recibido: ${data.damage_received}`);
           }
   
@@ -105,10 +109,9 @@ const game = (function() {
           }
 
           // Solo habilitamos el botón después de que todo haya terminado
-        if (!data.game_completed && !data.game_over && !data.next_battle) {
-          attackButton.disabled = false;
-      }
-
+          if (!data.game_completed && !data.game_over && !data.next_battle) {
+              attackButton.disabled = false;
+          }
 
       } catch (error) {
           console.error('Error en handleAttackResult:', error);
